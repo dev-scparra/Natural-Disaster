@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Earthquakes — The Tōhoku Case</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0B211F;
+    --bg-panel:#123832;
+    --bg-panel-2:#173F38;
+    --emerald:#3FA187;
+    --emerald-soft:#2A6E5C;
+    --lime:#9BD86A;
+    --seismic:#6E7B80;
+    --seismic-light:#AEB9BC;
+    --alert:#E2572B;
+    --alert-soft:#F2A65A;
+    --paper:#F4F1E7;
+    --ink:#0B211F;
+    --hair:rgba(244,241,231,0.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:#04100E;
+    font-family:'Source Serif 4', Georgia, serif;
+    color:var(--paper);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.mono,.stat,.nav-dots,.tag,.kit-item strong{
+    font-family:'Space Grotesk', 'Segoe UI', sans-serif;
+  }
+  .deck{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:36px;
+    padding:36px 0 80px;
+  }
+  .slide{
+    position:relative;
+    width:1280px;
+    height:720px;
+    max-width:100%;
+    overflow:hidden;
+    background:var(--bg-deep);
+    box-shadow:0 30px 80px -20px rgba(0,0,0,0.65);
+    flex-shrink:0;
+  }
+  /* ---------- shared chrome ---------- */
+  .frame-label{
+    position:absolute;
+    top:28px;
+    right:40px;
+    font-size:12px;
+    letter-spacing:0.12em;
+    color:var(--seismic-light);
+    z-index:5;
+  }
+  .frame-index{
+    position:absolute;
+    bottom:26px;
+    right:40px;
+    font-size:13px;
+    color:var(--seismic-light);
+    z-index:5;
+  }
+  .seismo-strip{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:46px;
+    overflow:hidden;
+    border-top:1px solid var(--hair);
+    background:rgba(4,16,14,0.55);
+    z-index:4;
+  }
+  .seismo-strip svg{
+    height:100%;
+    width:200%;
+    display:block;
+    animation:scrollWave 9s linear infinite;
+  }
+  @keyframes scrollWave{
+    from{transform:translateX(0);}
+    to{transform:translateX(-50%);}
+  }
+  .divider-diag{
+    position:absolute;
+    top:0; bottom:0;
+    width:2px;
+    background:linear-gradient(to bottom, transparent, var(--hair) 15%, var(--hair) 85%, transparent);
+  }
+  /* ============ SLIDE 1 ============ */
+  #s1{ display:flex; }
+  .s1-left{
+    width:46%;
+    height:100%;
+    background:
+      radial-gradient(120% 90% at 20% 10%, #1B4A41 0%, var(--bg-panel) 55%, #0E2B27 100%);
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .s1-right{
+    width:54%;
+    height:100%;
+    padding:64px 60px 90px 56px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    position:relative;
+  }
+  .s1-right .kicker{
+    font-size:14px;
+    color:var(--lime);
+    letter-spacing:0.02em;
+    margin:0 0 14px;
+  }
+  .s1-right h1{
+    font-size:52px;
+    line-height:1.06;
+    font-weight:600;
+    margin:0 0 22px;
+    color:var(--paper);
+    max-width:560px;
+  }
+  .s1-right p{
+    font-size:19px;
+    line-height:1.55;
+    color:#D8D9CE;
+    max-width:520px;
+    margin:0 0 16px;
+  }
+  .cause-row{
+    display:flex;
+    gap:18px;
+    margin-top:22px;
+  }
+  .cause-card{
+    flex:1;
+    border:1px solid var(--hair);
+    border-radius:4px;
+    padding:16px 18px;
+    background:rgba(255,255,255,0.02);
+  }
+  .cause-card .n{
+    font-size:12px;
+    color:var(--seismic-light);
+    letter-spacing:0.08em;
+    display:block;
+    margin-bottom:6px;
+  }
+  .cause-card .t{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:15px;
+    color:var(--paper);
+    font-weight:500;
+  }
+  .belt-wrap{
+    margin-top:26px;
+    display:flex;
+    align-items:center;
+    gap:22px;
+  }
+  .belt-stat{
+    font-size:44px;
+    font-weight:700;
+    color:var(--alert-soft);
+    line-height:1;
+  }
+  .belt-cap{
+    font-size:14.5px;
+    color:#D8D9CE;
+    line-height:1.4;
+    max-width:300px;
+  }
+
+  /* crust cross-section svg animations */
+  .plate-arrow{ transform-origin:center; }
+  .wave-ring{
+    transform-origin:center;
+    animation:pulseRing 2.8s ease-out infinite;
+  }
+  .wave-ring.r2{ animation-delay:0.9s; }
+  .wave-ring.r3{ animation-delay:1.8s; }
+  @keyframes pulseRing{
+    0%{ opacity:0.85; r:6; }
+    100%{ opacity:0; r:70; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .wave-ring{ animation:none; opacity:0.35; }
+    .seismo-strip svg{ animation:none; }
+  }
+
+  /* ============ SLIDE 2 ============ */
+  #s2{
+    background:
+      radial-gradient(90% 70% at 85% 0%, #133F37 0%, var(--bg-deep) 55%);
+    padding:56px 60px 70px;
+    display:flex;
+    flex-direction:column;
+  }
+  .s2-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    border-bottom:1px solid var(--hair);
+    padding-bottom:20px;
+    margin-bottom:26px;
+  }
+  .s2-head h1{
+    font-size:34px;
+    font-weight:600;
+    margin:0;
+    color:var(--paper);
+    max-width:560px;
+    line-height:1.15;
+  }
+  .s2-head .place-date{
+    font-size:14.5px;
+    color:var(--lime);
+    margin:0 0 8px;
+  }
+  .magnitude{
+    text-align:right;
+  }
+  .magnitude .num{
+    font-size:96px;
+    font-weight:700;
+    line-height:0.85;
+    color:var(--alert-soft);
+    letter-spacing:-0.02em;
+  }
+  .magnitude .lab{
+    font-size:13px;
+    color:var(--seismic-light);
+    letter-spacing:0.08em;
+    margin-top:6px;
+  }
+  .s2-body{
+    flex:1;
+    display:flex;
+    gap:40px;
+  }
+  .s2-mech{
+    width:44%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .s2-mech p{
+    font-size:16.5px;
+    line-height:1.55;
+    color:#D8D9CE;
+    margin:0 0 14px;
+  }
+  .s2-mech svg{ width:100%; height:auto; margin-bottom:10px; }
+  .s2-stats{
+    width:56%;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1px;
+    background:var(--hair);
+    border:1px solid var(--hair);
+    align-content:start;
+  }
+  .stat-cell{
+    background:var(--bg-deep);
+    padding:18px 20px;
+  }
+  .stat-cell .stat{
+    font-size:26px;
+    font-weight:600;
+    color:var(--paper);
+  }
+  .stat-cell .stat span{
+    font-size:15px;
+    color:var(--seismic-light);
+    font-weight:400;
+  }
+  .stat-cell .cap{
+    font-size:13.5px;
+    color:#B9BEB2;
+    margin-top:5px;
+    line-height:1.4;
+  }
+  .stat-cell.wide{ grid-column:1/-1; border-top:1px solid var(--hair); }
+
+  /* subduction diagram */
+  .subduct-arrow{
+    stroke-dasharray:6 5;
+    animation:dashMove 1.6s linear infinite;
+  }
+  @keyframes dashMove{ to{ stroke-dashoffset:-22; } }
+
+  /* ============ SLIDE 3 ============ */
+  #s3{
+    background:
+      linear-gradient(180deg, #0E2B27 0%, var(--bg-deep) 40%);
+    padding:56px 60px 90px;
+    display:flex;
+    flex-direction:column;
+  }
+  .s3-head{ margin-bottom:8px; }
+  .s3-head .kicker{ font-size:14px; color:var(--lime); margin:0 0 8px; }
+  .s3-head h1{ font-size:34px; font-weight:600; margin:0; color:var(--paper); }
+  .s3-note{
+    font-size:15.5px;
+    color:#D8D9CE;
+    margin:12px 0 24px;
+    max-width:760px;
+    line-height:1.5;
+  }
+  .s3-body{
+    flex:1;
+    display:flex;
+    gap:44px;
+  }
+  .steps{
+    width:46%;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    justify-content:center;
+  }
+  .step{
+    display:flex;
+    gap:16px;
+    align-items:flex-start;
+    padding:14px 16px;
+    border:1px solid var(--hair);
+    border-radius:4px;
+    background:rgba(255,255,255,0.02);
+  }
+  .step .num{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:22px;
+    font-weight:700;
+    color:var(--emerald);
+    min-width:30px;
+  }
+  .step .txt strong{
+    display:block;
+    font-size:16.5px;
+    color:var(--paper);
+    margin-bottom:3px;
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+  }
+  .step .txt span{
+    font-size:14px;
+    color:#C7CBC0;
+    line-height:1.4;
+  }
+  .kit{
+    width:54%;
+    display:flex;
+    gap:26px;
+    align-items:center;
+  }
+  .kit svg{ width:230px; height:auto; flex-shrink:0; }
+  .kit-list{
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+  }
+  .kit-item{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    font-size:14.5px;
+    color:#E4E1D3;
+    border-bottom:1px dashed var(--hair);
+    padding-bottom:8px;
+  }
+  .kit-item strong{
+    font-size:14px;
+    color:var(--lime);
+    font-weight:600;
+    min-width:14px;
+  }
+
+
+  /* ============ IMAGE ADD-ONS ============ */
+  .belt-wrap{ gap:16px; }
+  .belt-cap{ max-width:250px; }
+  .map-thumb{
+    width:84px;
+    height:84px;
+    border-radius:10px;
+    overflow:hidden;
+    flex-shrink:0;
+    border:1px solid var(--hair);
+    box-shadow:0 10px 26px -10px rgba(0,0,0,0.65);
+    position:relative;
+  }
+  .map-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    filter:saturate(0.92) contrast(1.04);
+  }
+  .map-thumb::after{
+    content:"RING OF FIRE";
+    position:absolute;
+    left:0; right:0; bottom:0;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:7.5px;
+    letter-spacing:0.05em;
+    text-align:center;
+    color:var(--paper);
+    padding:3px 2px 2px;
+    background:linear-gradient(to top, rgba(4,16,14,0.92), rgba(4,16,14,0));
+  }
+
+  .s2-gallery{
+    display:flex;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .s2-gallery figure{
+    margin:0;
+    position:relative;
+    flex:1;
+    height:80px;
+    border-radius:6px;
+    overflow:hidden;
+    border:1px solid var(--hair);
+    background:var(--bg-panel);
+  }
+  .s2-gallery img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    filter:saturate(0.9) contrast(1.05);
+  }
+  .s2-gallery figcaption{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    padding:5px 9px 4px;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:9.5px;
+    letter-spacing:0.02em;
+    color:var(--paper);
+    background:linear-gradient(to top, rgba(4,16,14,0.92), rgba(4,16,14,0));
+  }
+
+  .s3-gallery{
+    margin-top:10px;
+    display:flex;
+    justify-content:center;
+  }
+  .s3-gallery figure{
+    margin:0;
+    position:relative;
+    border-radius:8px;
+    overflow:hidden;
+    border:1px solid var(--hair);
+    box-shadow:0 12px 30px -12px rgba(0,0,0,0.65);
+    max-height:96px;
+    line-height:0;
+  }
+  .s3-gallery img{
+    display:block;
+    max-height:96px;
+    width:auto;
+    max-width:100%;
+  }
+  .s3-gallery figcaption{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    padding:4px 10px 4px;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:9.5px;
+    letter-spacing:0.03em;
+    color:var(--paper);
+    text-align:center;
+    background:linear-gradient(to top, rgba(4,16,14,0.92), rgba(4,16,14,0));
+  }
+
+  /* nav dots */
+  .nav-dots{
+    position:fixed;
+    right:22px;
+    top:50%;
+    transform:translateY(-50%);
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    z-index:50;
+  }
+  .nav-dots button{
+    width:9px; height:9px;
+    border-radius:50%;
+    border:1px solid var(--seismic-light);
+    background:transparent;
+    cursor:pointer;
+    padding:0;
+  }
+  .nav-dots button.active{ background:var(--lime); border-color:var(--lime); }
+
+  @media (max-width:1340px){
+    .nav-dots{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-dots" aria-hidden="true">
+  <button class="active" onclick="document.getElementById('s1').scrollIntoView({behavior:'smooth'})"></button>
+  <button onclick="document.getElementById('s2').scrollIntoView({behavior:'smooth'})"></button>
+  <button onclick="document.getElementById('s3').scrollIntoView({behavior:'smooth'})"></button>
+</div>
+
+<div class="deck">
+
+  <!-- ================= SLIDE 1 ================= -->
+  <section class="slide" id="s1">
+    <span class="frame-label">EARTHQUAKES · THE TŌHOKU CASE</span>
+
+    <div class="s1-left">
+      <svg viewBox="0 0 520 620" width="86%" height="86%">
+        <defs>
+          <linearGradient id="crustGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#2F6E5D"/>
+            <stop offset="100%" stop-color="#123832"/>
+          </linearGradient>
+        </defs>
+        <!-- ocean -->
+        <rect x="0" y="60" width="520" height="120" fill="#0E2B27"/>
+        <!-- overriding plate (Okhotsk) -->
+        <path d="M0,180 L300,180 L360,320 L0,340 Z" fill="url(#crustGrad)" stroke="#3FA187" stroke-width="1.5"/>
+        <!-- subducting plate (Pacific) -->
+        <path d="M300,180 L520,150 L520,270 L360,320 Z" fill="#0F3B33" stroke="#6E7B80" stroke-width="1.5"/>
+        <!-- mantle -->
+        <rect x="0" y="330" width="520" height="290" fill="#0A211D"/>
+        <!-- lock point -->
+        <circle class="wave-ring" cx="330" cy="300" r="6" fill="none" stroke="#E2572B" stroke-width="2"/>
+        <circle class="wave-ring r2" cx="330" cy="300" r="6" fill="none" stroke="#E2572B" stroke-width="2"/>
+        <circle class="wave-ring r3" cx="330" cy="300" r="6" fill="none" stroke="#E2572B" stroke-width="2"/>
+        <circle cx="330" cy="300" r="7" fill="#E2572B"/>
+        <!-- plate motion arrows -->
+        <g class="plate-arrow">
+          <path d="M420,200 L460,225" stroke="#9BD86A" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+        </g>
+        <g class="plate-arrow">
+          <path d="M180,230 L140,255" stroke="#AEB9BC" stroke-width="3" fill="none" marker-end="url(#arrow2)"/>
+        </g>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="#9BD86A"/>
+          </marker>
+          <marker id="arrow2" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="#AEB9BC"/>
+          </marker>
+        </defs>
+        <!-- labels -->
+        <text x="405" y="185" fill="#9BD86A" font-family="Space Grotesk" font-size="15">Pacific Plate</text>
+        <text x="55" y="215" fill="#AEB9BC" font-family="Space Grotesk" font-size="15">Okhotsk Plate</text>
+        <text x="345" y="345" fill="#F4F1E7" font-family="Space Grotesk" font-size="13">rupture point</text>
+      </svg>
+    </div>
+
+    <div class="s1-right">
+      <p class="kicker">Natural disasters — Part 1</p>
+      <h1>A sudden release of energy the crust can no longer hold</h1>
+      <p>An earthquake is the sudden release of energy in the Earth's crust, caused by shifting tectonic plates. That release sends out seismic waves that shake the ground above.</p>
+
+      <div class="cause-row">
+        <div class="cause-card">
+          <span class="n">STRESS</span>
+          <span class="t">Plates lock instead of sliding, and pressure builds for decades.</span>
+        </div>
+        <div class="cause-card">
+          <span class="n">RELEASE</span>
+          <span class="t">The lock breaks, the crust snaps, and energy radiates outward.</span>
+        </div>
+      </div>
+
+      <div class="belt-wrap">
+        <span class="belt-stat">90%</span>
+        <span class="belt-cap">of the world's earthquakes occur along the Pacific Ring of Fire — a belt of faults and volcanoes running through Japan, Indonesia, Chile, and the U.S. west coast, recording over 81,000 quakes a year.</span>
+        <div class="map-thumb"><img src="images/ring-of-fire.png" alt="Pacific Ring of Fire map"></div>
+      </div>
+    </div>
+
+    <div class="seismo-strip">
+      <svg viewBox="0 0 800 46" preserveAspectRatio="none">
+        <polyline fill="none" stroke="#3FA187" stroke-width="1.4" points="0,23 40,23 55,6 70,40 85,23 200,23 215,15 230,30 245,23 500,23 515,3 530,42 545,23 800,23 815,6 830,40 845,23 1000,23 1015,15 1030,30 1045,23 1300,23 1315,3 1330,42 1345,23 1600,23"/>
+      </svg>
+    </div>
+    <span class="frame-index">01 / 03</span>
+  </section>
+
+  <!-- ================= SLIDE 2 ================= -->
+  <section class="slide" id="s2">
+    <span class="frame-label">EARTHQUAKES · THE TŌHOKU CASE</span>
+
+    <div class="s2-head">
+      <div>
+        <p class="place-date">Off the Pacific coast of Tōhoku, Japan — March 11, 2011</p>
+        <h1>The strongest earthquake ever recorded in Japan</h1>
+      </div>
+      <div class="magnitude">
+        <div class="num">9.0</div>
+        <div class="lab">MOMENT MAGNITUDE</div>
+      </div>
+    </div>
+
+    <div class="s2-gallery">
+      <figure><img src="images/quake-1.jpg" alt="Ruined house amid tsunami debris, Tōhoku 2011"><figcaption>Coastal homes flattened by the wave</figcaption></figure>
+      <figure><img src="images/quake-2.jpg" alt="Tsunami wave overtaking a coastal road with cars"><figcaption>The wave overtaking the coastal road</figcaption></figure>
+      <figure><img src="images/quake-3.jpg" alt="Aerial view of Tōhoku devastation with two people walking"><figcaption>Aerial view of the aftermath</figcaption></figure>
+    </div>
+
+    <div class="s2-body">
+      <div class="s2-mech">
+        <svg viewBox="0 0 420 190">
+          <path d="M0,60 L230,60 L280,150 L0,165 Z" fill="#173F38" stroke="#3FA187" stroke-width="1.4"/>
+          <path d="M230,60 L420,40 L420,130 L280,150 Z" fill="#0F3B33" stroke="#6E7B80" stroke-width="1.4"/>
+          <path class="subduct-arrow" d="M340,55 Q290,95 285,140" fill="none" stroke="#E2572B" stroke-width="2.4"/>
+          <text x="250" y="30" fill="#AEB9BC" font-family="Space Grotesk" font-size="13">Pacific Plate</text>
+          <text x="20" y="40" fill="#9BD86A" font-family="Space Grotesk" font-size="13">Okhotsk Plate</text>
+        </svg>
+        <p>Offshore, the Pacific Plate slowly dives beneath the Okhotsk Plate. When the plates lock instead of sliding, stress accumulates for decades — until it releases all at once.</p>
+        <p>In 2011, a 500-km stretch of fault slipped up to 50 meters in minutes, thrusting the seafloor upward and displacing a massive volume of water. That displacement created the tsunami.</p>
+      </div>
+
+      <div class="s2-stats">
+        <div class="stat-cell">
+          <div class="stat">40<span> m</span></div>
+          <div class="cap">Maximum wave height recorded along the coast</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat">10<span> km</span></div>
+          <div class="cap">Distance the tsunami traveled inland within minutes</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat">~20,000</div>
+          <div class="cap">People dead or missing — most from the tsunami, not the shaking</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat">120,000+</div>
+          <div class="cap">Buildings destroyed along the coast</div>
+        </div>
+        <div class="stat-cell wide">
+          <div class="stat">7.9 <span>aftershock, 30 min later</span></div>
+          <div class="cap">The tsunami also disabled Fukushima's cooling systems, causing the worst nuclear accident since Chernobyl — one event triggered a chain of disasters.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="seismo-strip">
+      <svg viewBox="0 0 800 46" preserveAspectRatio="none">
+        <polyline fill="none" stroke="#E2572B" stroke-width="1.4" points="0,23 40,23 55,-2 70,48 85,23 100,10 115,36 130,23 400,23 415,-2 430,48 445,23 460,10 475,36 490,23 800,23 815,-2 830,48 845,23 860,10 875,36 890,23 1160,23 1175,-2 1190,48 1205,23 1220,10 1235,36 1250,23 1600,23"/>
+      </svg>
+    </div>
+    <span class="frame-index">02 / 03</span>
+  </section>
+
+  <!-- ================= SLIDE 3 ================= -->
+  <section class="slide" id="s3">
+    <span class="frame-label">EARTHQUAKES · THE TŌHOKU CASE</span>
+
+    <div class="s3-head">
+      <p class="kicker">Natural disasters — Part 3</p>
+      <h1>Consequences don't end when the shaking stops — but survival is learnable</h1>
+    </div>
+    <p class="s3-note">Most earthquake injuries come from falling objects, not collapsing buildings. Three simple steps, and one packed bag, greatly reduce the risk.</p>
+
+    <div class="s3-body">
+      <div class="steps">
+        <div class="step">
+          <span class="num">1</span>
+          <span class="txt"><strong>Drop</strong><span>Get down onto your hands and knees before the shaking knocks you over.</span></span>
+        </div>
+        <div class="step">
+          <span class="num">2</span>
+          <span class="txt"><strong>Cover</strong><span>Take cover under a sturdy table, protecting your head and neck.</span></span>
+        </div>
+        <div class="step">
+          <span class="num">3</span>
+          <span class="txt"><strong>Hold On</strong><span>Hold on to the table leg until the shaking stops completely.</span></span>
+        </div>
+        <div class="step">
+          <span class="num">↑</span>
+          <span class="txt"><strong>Near the coast?</strong><span>Move to higher ground the moment shaking ends — strong shaking near the sea is nature's own tsunami warning.</span></span>
+        </div>
+      </div>
+
+      <div class="kit">
+        <svg viewBox="0 0 220 260">
+          <path d="M50,70 h120 v150 a12,12 0 0 1 -12,12 h-96 a12,12 0 0 1 -12,-12 z" fill="#173F38" stroke="#3FA187" stroke-width="2"/>
+          <rect x="80" y="52" width="60" height="28" rx="6" fill="none" stroke="#3FA187" stroke-width="2"/>
+          <line x1="50" y1="120" x2="170" y2="120" stroke="#0B211F" stroke-width="2"/>
+          <circle cx="110" cy="150" r="16" fill="#E2572B"/>
+          <path d="M110,142 v16 M102,150 h16" stroke="#F4F1E7" stroke-width="2.4"/>
+          <rect x="65" y="185" width="34" height="20" rx="3" fill="#0F3B33" stroke="#9BD86A" stroke-width="1.5"/>
+          <rect x="121" y="185" width="34" height="20" rx="3" fill="#0F3B33" stroke="#9BD86A" stroke-width="1.5"/>
+        </svg>
+        <div class="kit-list">
+          <div class="kit-item"><strong>—</strong>Water for three days</div>
+          <div class="kit-item"><strong>—</strong>Non-perishable food</div>
+          <div class="kit-item"><strong>—</strong>Flashlight with extra batteries</div>
+          <div class="kit-item"><strong>—</strong>First aid kit</div>
+          <div class="kit-item"><strong>—</strong>Battery-powered radio for official updates</div>
+          <div class="kit-item"><strong>—</strong>Copies of important documents, in a waterproof bag</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="s3-gallery">
+      <figure>
+        <img src="images/safety-steps.png" alt="Drop, Cover, and Hold On earthquake safety illustration">
+        <figcaption>Drop · Cover · Hold On</figcaption>
+      </figure>
+    </div>
+
+    <div class="seismo-strip">
+      <svg viewBox="0 0 800 46" preserveAspectRatio="none">
+        <polyline fill="none" stroke="#9BD86A" stroke-width="1.4" points="0,23 60,23 75,10 90,36 105,23 300,23 315,6 330,40 345,23 600,23 615,10 630,36 645,23 900,23 915,6 930,40 945,23 1200,23 1215,10 1230,36 1245,23 1600,23"/>
+      </svg>
+    </div>
+    <span class="frame-index">03 / 03</span>
+  </section>
+
+</div>
+
+</body>
+</html>
