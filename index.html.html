@@ -252,6 +252,7 @@
     display:flex;
     flex-direction:column;
     justify-content:center;
+    transform:translateY(-24px);
   }
   .s2-mech p{
     font-size:16.5px;
@@ -259,7 +260,7 @@
     color:#D8D9CE;
     margin:0 0 14px;
   }
-  .s2-mech svg{ width:100%; height:auto; margin-bottom:10px; }
+  .s2-mech svg{ width:100%; height:150px; margin-bottom:10px; }
   .s2-stats{
     width:56%;
     display:grid;
@@ -325,14 +326,14 @@
     width:46%;
     display:flex;
     flex-direction:column;
-    gap:14px;
-    justify-content:center;
+    gap:10px;
+    justify-content:flex-start;
   }
   .step{
     display:flex;
     gap:16px;
     align-items:flex-start;
-    padding:14px 16px;
+    padding:10px 16px;
     border:1px solid var(--hair);
     border-radius:4px;
     background:rgba(255,255,255,0.02);
@@ -359,24 +360,26 @@
   }
   .kit{
     width:54%;
-    display:flex;
-    gap:26px;
-    align-items:center;
+    display:grid;
+    grid-template-columns:170px 1fr;
+    gap:12px 18px;
+    align-items:start;
+    padding-top:0;
   }
-  .kit svg{ width:230px; height:auto; flex-shrink:0; }
+  .kit svg{ width:170px; height:auto; flex-shrink:0; }
   .kit-list{
     display:flex;
     flex-direction:column;
-    gap:9px;
+    gap:4px;
   }
   .kit-item{
     display:flex;
     align-items:baseline;
     gap:10px;
-    font-size:14.5px;
+    font-size:13px;
     color:#E4E1D3;
     border-bottom:1px dashed var(--hair);
-    padding-bottom:8px;
+    padding-bottom:4px;
   }
   .kit-item strong{
     font-size:14px;
@@ -388,10 +391,11 @@
 
   /* ============ IMAGE ADD-ONS ============ */
   .belt-wrap{ gap:16px; }
-  .belt-cap{ max-width:250px; }
+  .belt-wrap{ transform:translateY(-38px); }
+  .belt-cap{ max-width:290px; }
   .map-thumb{
-    width:84px;
-    height:84px;
+    width:118px;
+    height:118px;
     border-radius:10px;
     overflow:hidden;
     flex-shrink:0;
@@ -453,7 +457,8 @@
   }
 
   .s3-gallery{
-    margin-top:10px;
+    grid-column:1 / -1;
+    margin-top:0;
     display:flex;
     justify-content:center;
   }
@@ -464,12 +469,12 @@
     overflow:hidden;
     border:1px solid var(--hair);
     box-shadow:0 12px 30px -12px rgba(0,0,0,0.65);
-    max-height:96px;
+    max-height:140px;
     line-height:0;
   }
   .s3-gallery img{
     display:block;
-    max-height:96px;
+    max-height:140px;
     width:auto;
     max-width:100%;
   }
@@ -713,14 +718,13 @@
           <div class="kit-item"><strong>—</strong>Battery-powered radio for official updates</div>
           <div class="kit-item"><strong>—</strong>Copies of important documents, in a waterproof bag</div>
         </div>
+        <div class="s3-gallery">
+          <figure>
+            <img src="images/safety-steps.png" alt="Drop, Cover, and Hold On earthquake safety illustration">
+            <figcaption>Drop · Cover · Hold On</figcaption>
+          </figure>
+        </div>
       </div>
-    </div>
-
-    <div class="s3-gallery">
-      <figure>
-        <img src="images/safety-steps.png" alt="Drop, Cover, and Hold On earthquake safety illustration">
-        <figcaption>Drop · Cover · Hold On</figcaption>
-      </figure>
     </div>
 
     <div class="seismo-strip">
